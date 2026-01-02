@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }}</title>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * { padding: 0px; margin: 0px; }
+        .top { display: flex; position: fixed; gap: 25px; right: 200px; top:20px; z-index: 100; }
+        .top>div { cursor: pointer; }
+        .content { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 50px; width: 80vw; padding-top:80px; margin:auto; }
+        
+        .post-detail { text-align: left; width: 100%; max-width: 800px; line-height: 1.6; }
+        .post-detail h1, h2, h3 { margin-bottom: 20px; color: #333; }
+        .post-detail p { margin-bottom: 15px; }
+        
+        .post { text-align: center; width: 400px; color: rgb(251, 182, 92); transition: color 0.6s ease; cursor: pointer; }
+        .post:hover { color: rgb(90, 183, 230); }
+        .post>span { color: black; }
+        a { text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="top">
+        <div class="div" onclick="window.location.assign('/')">首页</div>
+        <div class="div" onclick="window.location.assign('/about.html')">关于</div>
+    </div>
+
+    <div class="content">
+        {{ content }}
+    </div>
+</body>
+</html>

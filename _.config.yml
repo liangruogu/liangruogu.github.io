@@ -1,0 +1,8 @@
+theme: []
+
+title: forest's Blog
+description: 我的个人博客
+
+markdown: kramdown
+kramdown:
+  math_engine: mathjax 
