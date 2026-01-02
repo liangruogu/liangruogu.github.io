@@ -1,43 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page.title }}</title>
+    <title>{{ page.title }} | forest's Blog</title>
+    
     <script>
-        window.MathJax = {
-            tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']],
-            processEscapes: true
-            }
-        };
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$']],
+          processEscapes: true
+        }
+      };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        * { padding: 0px; margin: 0px; }
-        .top { display: flex; position: fixed; gap: 25px; right: 200px; top:20px; z-index: 100; }
-        .top>div { cursor: pointer; }
-        .content { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 50px; width: 80vw; padding-top:80px; margin:auto; }
+        * { padding: 0; margin: 0; box-sizing: border-box; }
+        body { 
+            background-color: #fff;
+            font-family: 'Noto Serif SC', "Optima", "Georgia", serif;
+            color: #333;
+        }
+
+        .top { 
+            display: flex; 
+            position: fixed; 
+            gap: 25px; 
+            right: 10%; 
+            top: 25px; 
+            z-index: 1000;
+            font-family: sans-serif;
+        }
+        .top > div { 
+            cursor: pointer; 
+            transition: color 0.3s;
+            font-size: 16px;
+        }
+        .top > div:hover { color: #2b5e77; }
+
+        .content { 
+            width: 100%;
+            padding-top: 100px;
+            padding-bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .post-detail-content {
+            width: 90%;
+            max-width: 850px;
+            font-size: 19px; 
+            line-height: 1.8;
+            text-align: left;
+        }
+
+        /* 标题处理 */
+        .post-detail-content h1 {
+            text-align: center;
+            color: #2b5e77;
+            font-size: 2.2em;
+            margin-bottom: 50px;
+            margin-top: 20px;
+            font-weight: 700;
+        }
+
+        .post-detail-content h2, 
+        .post-detail-content h3 {
+            text-align: left;
+            color: #2b5e77;
+            margin-top: 1.6em;
+            margin-bottom: 0.8em;
+            font-weight: 700;
+        }
         
-        .post-detail { text-align: left; width: 100%; max-width: 800px; line-height: 1.6; }
-        .post-detail h1, h2, h3 { margin-bottom: 20px; color: #333; }
-        .post-detail p { margin-bottom: 15px; }
+        .post-detail-content h2 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        .post-detail-content p {
+            margin-bottom: 1.5em;
+            word-wrap: break-word;
+        }
         
-        .post { text-align: center; width: 400px; color: rgb(251, 182, 92); transition: color 0.6s ease; cursor: pointer; }
+        .post-detail-content ul, 
+        .post-detail-content ol {
+            margin-left: 1.5em;
+            margin-bottom: 1.5em;
+            text-align: left;
+        }
+
+        /* 引用块 */
+        .post-detail-content blockquote {
+            border-left: 4px solid #2b5e77;
+            padding: 10px 25px;
+            background-color: #f8fbfd;
+            color: #555;
+            margin: 25px 0;
+            font-style: italic;
+        }
+
+        mjx-container {
+            font-size: 108% !important;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            color: #2b5e77;
+        }
+        
+        pre {
+            background: #f1f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+
+        .post { 
+            text-align: center; 
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            color: rgb(251, 182, 92); 
+            transition: color 0.4s; 
+            cursor: pointer;
+        }
         .post:hover { color: rgb(90, 183, 230); }
-        .post>span { color: black; }
-        a { text-decoration: none; }
+        .post span { color: #888; font-size: 14px; }
+        a { text-decoration: none; color: inherit; }
+
     </style>
 </head>
 <body>
-    <div class="top">
-        <div class="div" onclick="window.location.assign('/')">首页</div>
-        <div class="div" onclick="window.location.assign('/about.html')">关于</div>
-    </div>
 
-    <div class="content">
-        {{ content }}
-    </div>
+    <nav class="top">
+        <div onclick="window.location.assign('/')">首页</div>
+        <div onclick="window.location.assign('/about.html')">关于</div>
+    </nav>
+
+    <main class="content">
+        <article class="post-detail-content">
+            {{ content }}
+        </article>
+    </main>
+
 </body>
 </html>
