@@ -4,6 +4,8 @@ class: post-page
 title: Thoughts on Programming Language
 ---
 
+# Thoughts on Programming Language
+
 ## 缘由
 之前就一直对平铺式管理窗口的工作模式很感兴趣，但是始终觉得像 Hyprland, Niri 这一类新时代的 Wayland 桌面环境太重了,有点过于追求视觉审美(没有冒犯的意思, bushi, 任何能达到高效率的工作方式都是极好的！！) 
 
