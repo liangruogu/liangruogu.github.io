@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thoughts on Programming Language</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                tags: 'ams'
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- 引入 highlight.js 的 GitHub 浅色主题样式 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <!-- 引入 highlight.js 核心脚本 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- 额外加载对 Zig 语言的支持 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/zig.min.js"></script>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #fff;
+            color: #333;
+            font-family: 'Noto Serif SC', 'Georgia', serif;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 40px;
+        }
+
+        .top {
+            display: flex;
+            position: fixed;
+            gap: 25px;
+            right: 200px;
+            top: 20px;
+            z-index: 1000;
+        }
+
+        .top>div {
+            cursor: pointer;
+            font-family: sans-serif;
+        }
+
+        .content {
+            width: 100%;
+            padding-top: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .index-page .post {
+            text-align: center;
+            width: 400px;
+            margin-bottom: 50px;
+            color: rgb(251, 182, 92);
+            transition: color 0.6s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .index-page .post:hover {
+            color: rgb(90, 183, 230);
+        }
+
+        .index-page .post>span {
+            color: black;
+            cursor: auto;
+        }
+
+        .index-page a {
+            text-decoration: none;
+        }
+
+        .post-page {
+            width: 90%;
+            max-width: 850px;
+            text-align: left;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 19px;
+            line-height: 1.8;
+        }
+
+        .post-page h1 {
+            text-align: center;
+            color: #2b5e77;
+            font-size: 2.2em;
+            margin-bottom: 50px;
+            margin-top: 20px;
+        }
+
+        .post-page h2,
+        .post-page h3 {
+            text-align: left;
+            color: #2b5e77;
+            margin: 1.6em 0 0.8em;
+        }
+
+        .post-page h2 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        .post-page p,
+        .post-page ul,
+        .post-page ol {
+            text-align: left;
+            margin-bottom: 1.5em;
+        }
+
+        /* 优化列表的缩进和对齐，使其与上方段落左侧完美对齐 */
+        .post-page ul,
+        .post-page ol {
+            padding-left: 24px;
+            list-style-position: outside;
+        }
+
+        /* 如果列表中有嵌套列表，微调下边距防止间距过大 */
+        .post-page li {
+            margin-bottom: 0.4em;
+        }
+
+        .post-page blockquote {
+            border-left: 4px solid #2b5e77;
+            padding: 5px 25px;
+            background: #f8fbfd;
+            font-style: italic;
+            margin: 25px 0;
+        }
+
+        /* 修复引用块下方空行的问题 */
+        .post-page blockquote>*:last-child {
+            margin-bottom: 0 !important;
+        }
+
+        mjx-container {
+            color: #000000;
+            font-size: 105% !important;
+        }
+
+        pre {
+            background: #f6f8fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 15px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #d0d7de;
+        }
+
+        .post-page mark {
+            background-color: #fff5b1;
+            color: #333;
+            padding: 0 4px;
+            margin: 0 2px;
+        }
+
+        /* 行内代码样式（比如正文里的 `code`） */
+        .post-page code {
+            background-color: #f1f4f6;
+            color: #e83e8c;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.9em;
+        }
+
+        /* 多行代码块样式优化：完全移交给 highlight.js 染色，防止文字变粉色 */
+        .post-page pre code {
+            background-color: transparent !important;
+            padding: 0 !important;
+            color: inherit !important;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+            font-size: 1em !important;
+        }
+
+        .post-page a {
+            color: #3182ce;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(49, 130, 206, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .post-page a:hover {
+            color: #2c5282;
+            border-bottom: 1px solid #2c5282;
+            background-color: rgba(49, 130, 206, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .top {
+                position: fixed;
+                left: 0;
+                top: 0;
+                right: 0;
+                display: flex;
+                justify-content: center;
+                gap: 35px;
+                height: 50px;
+                align-items: center;
+                background-color: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(5px);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                z-index: 1000;
+            }
+
+            .top>div {
+                font-size: 16px;
+                color: #333;
+            }
+
+            .content {
+                padding-top: 70px;
+            }
+
+            .post-page {
+                width: 95%;
+                font-size: 17px;
+                line-height: 1.6;
+            }
+
+            .post-page h1 {
+                font-size: 1.6em;
+                margin-bottom: 30px;
+            }
+
+            mjx-container[display="true"],
+            pre {
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                max-width: 100%;
+                padding: 10px;
+            }
+
+            .post-page blockquote {
+                padding: 10px 15px;
+                margin: 15px 0;
+            }
+
+            .index-page .post {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="top">
+        <div onclick="window.location.assign('/')">首页</div>
+        <div onclick="window.location.assign('/about.html')">关于</div>
+    </nav>
+
+    <main class="content">
+        <article class="post-page">
+            <h1 id="thoughts-on-programming-language">Thoughts on Programming Language</h1>
+
+<h2 id="缘由">缘由</h2>
+<p>之前就一直对平铺式管理窗口的工作模式很感兴趣，但是始终觉得像 Hyprland, Niri 这一类新时代的 Wayland 桌面环境太重了,有点过于追求视觉审美(没有冒犯的意思, bushi, 任何能达到高效率的工作方式都是极好的！！)</p>
+
+<p>所以想尝试一些更轻量化的 Wayland 方案，例如 <a href="https://codeberg.org/river/river">River</a> 一个比较小众的 Wayland Compositor. 0.4.0 版本以前的 River-classic 还是一个桌面环境，但作者认为中间有太多的工作可以拆分成更明确的<a href="https://isaacfreund.com/blog/river-window-management/">模块</a>,所以把 Window Manager, Display Server 和 Compositor 拆开了. 故事从这里开始</p>
+
+<h2 id="river-与-andrew">River 与 Andrew</h2>
+<p>River 就是用<a href="https://codeberg.org/ziglang">Zig</a> 完成的，这是立志成为 Better C 的一门语言，起初我觉得它和 Rust 无出一二，都是新时代的产物吧。但有一则<a href="https://ziglang.org/news/migrating-from-github-to-codeberg/">新闻</a>引起了我的注意：Zig 的创始人将原本已经放在 Github 上十年的 git 仓库搬到了 Codeberg ，原因如下：</p>
+
+<ol>
+  <li>自从 Github 被微软收购成为 Agent 训练场以后，他的工程文化和技术质量下滑，界面臃肿且缓慢</li>
+  <li>Github Actions 出现了一个非常低级的自定义的sleep错误导致调度玄学, Andrew不愿意再将赞助者的钱来填补 Github 的技术债</li>
+  <li>Github 强推 Copilot等AI功能，但 Zig 有严格禁止 LLM 的策略</li>
+</ol>
+
+<p>这让我意识到 Andrew 是一位非常有个性，且务实的人，他能经得起 LLM 抽奖的诱惑（也许是老一辈程序员的资本吧，觉得 LLM 的代码不如自己的，修 BUG 不如自己写一遍）</p>
+
+<p>我开始关注这门语言，其实在很早之前，大一那会我就开始接触 JS 的代码了，糊里糊涂的下了 NodeJS, 使用 npm 和 nvm 这些，但我当时远不知道他们的含义， 也经常尝试使用像deno, bun 这样的工具。</p>
+
+<p>直到另一则新闻: <a href="https://github.com/oven-sh/bun">Bun</a> 一款用 Zig glue 底层使用 Apple 的 JS 引擎的JS运行时被 全部用 Rust 重写, 当时我只觉得这是编程元神 Rust 那群人在发力(其实我也挺喜欢 Rust 的， 但还是受不了占内存到爆炸的 LSP 以及和我据理力争的编译器). 但我看到了<a href="https://bun.com/blog/bun-in-rust">这个</a>, 大概内容是：</p>
+
+<ol>
+  <li>介绍了 Bun 的由来, 从最开始的 GO 到 Zig 再到 Rust, Bun的创始人 Sumner 强调 Zig 是一门很好的语言，没有 Zig 就没有 Bun</li>
+  <li>但是因为 bun 实在承载了太多，一个 JS 的运行时需要包括 JS 引擎，和系统交互的基础组件（例如fs, 网络等等）,JS 是单线程的语言，还需要事件循环和异步等等。除了这些它还需要兼容 NodeJS,以及打包 测试等一系列的功能。</li>
+  <li>规模扩大导致的稳定性挑战，由于 JS 的 GC 和手动管理内存混合使用，这导致在 Zig 中很难维护，导致了大量的 Use-After-Free 以及 Double-Free 和内存泄漏的问题。</li>
+  <li>Rust 相比与 Zig 是一门更加成熟，而且非常注重内存管理的语言，可以借助编译器引用检查和 RALL来杜绝这些问题</li>
+</ol>
+
+<p>由此，他们借助 Claude AI 在 11 天内疯狂的重写 (非常疯狂的行为，我认为)</p>
+
+<p>通过四个工作区，同时运行 64 个 Claude 实例并行修改，提交了 6502 次 Commit 完成了超过100万行代码。当我看到 新版本的 Bun 不仅没有新添Bug 还修复了多达 128个的崩溃和泄漏 Bug，并提升成了 4% 左右的性能，我意识到，这并不是一场 Anthropic 自私的作秀，而是：</p>
+
+<blockquote>
+  <p>一场<strong>真真正正的 AI 与 人类 与 编程语言 的工程创新实践</strong></p>
+</blockquote>
+
+<p>我觉得这场实践能成功的主要原因有两个：</p>
+
+<ol>
+  <li>工程师对这场大型的语言转写进行了详细的文档注释(从 Zig 的语言特性到如何用 Rust重写进行了详细的说明, 给 AI 设定了很多 Ground Rule)</li>
+  <li>Rust 天然适合 AI, 我一直觉得 AI 底层的 Transformer 始终是指一个概率模型，那就是抽奖，都是概率问题而且，但 Rust 的语言特性，包括编译管理方式都非常适合无人参与的 AI loop, AI 写一版本代码，让 Rust 编译器检查，根据详尽的报错信息，就可以修改代码，直到通过编译，并运行，这样做出来的代码，天然的 Bug 就少. 可以看出 Rust 在 prictical 方面是非常优秀的</li>
+</ol>
+
+<h2 id="编程语言大战">编程语言大战</h2>
+
+<p>你知道的，新手嘛，喜欢学点新东西很正常，所以多多少少的，什么C++, js, zig, rust, go, java, python, D都看了看，大二时候的我认为不同编程语言之间的区别可能只是单纯由应用场景划分吧，也许 Python 爬虫这块生态好所以用的多，Java 这块稳定高效，所以后端用的多。</p>
+
+<p>区别于 脚本语言, 编译型语言, 面向对象这些概念，我接触到最新颖的就是 Rust 的生命周期了，它没有 GC, 通常来说高级语言例如：GO, js 这些都会有 GC， 等变量内存累计到一定程度来，来一次垃圾车的大扫除，扫描一遍所有的引用，看看那些引用没有用了，就回收进来。这样做的坏处有：</p>
+
+<ol>
+  <li>垃圾车开始扫描的时候，整个程序会轻微卡顿,例如 JS 上可能是几毫秒的网页卡顿</li>
+  <li>在python里可能会有一些引用之间交叉引用导致，计数引用的count始终大于0,而无法回收。这就会造成内存泄漏</li>
+</ol>
+
+<p>除此之外，GC 其实还是挺好的，不需要程序员像写 C 一样手动管理内存，在什么时候回收都必须写的清清楚楚.</p>
+
+<h3 id="rust">Rust</h3>
+
+<p>回到 Rust 的内存管理，它没有 GC 因为在 Rust 中有一套所有权体系, 任何一个变量都只能有一个owner, 但可以有多个引用，引用又分为可变引用和不可变引用，不可变引用只能读取值，而可变引用只能有一个，可以修改内容。将变量传入函数 或者 遍历(可迭代对象)一次 会消耗所有权，变量会被回收. 在这套体系下，变量能被安全的读取和修改，但是！！ 也因此，Rust的类型推导非常复杂, LSP 为了解析所有变量的生命周期，需要占用大量内存，我很不喜欢 :( 这让我的 VScode 写 rust 的时候卡卡的，当我用迷你主机打开 <a href="https://github.com/zed-industries/zed">Zed</a> 的时候会直接卡住，还是 16GB 内存哦</p>
+
+<h3 id="zig">Zig</h3>
+
+<p>新生代语言: Zig 他的定位就是成为更好的 C, 设计理念也很清晰，没有隐式的控制流，没有隐式的内存分配，对应的特点如下：</p>
+
+<ol>
+  <li>没有隐藏控制流： 没有算符重载， a + b 只会是两个数字相加</li>
+  <li>没有隐式抛出异常： 错误必须显式处理</li>
+  <li>没有隐藏的内存分配：任何需要分配内存的函数都必须显式接受一个分配器作为参数</li>
+  <li>使用 comptime 取代宏和泛型</li>
+  <li>与 C 语言无缝交互, Zig 自带完成的 C 编译器</li>
+  <li>简单至上（上一个这么说的是Go） 整个语言的关键词很少</li>
+</ol>
+
+<p>不少程序员都表示 Zig 写起来非常舒服，不像 Rust (</p>
+
+<p>最开始我看到它也没有 GC 的时候就有点退堂鼓了，是不是和 C 一样要手动管理，好麻烦，然后疑惑为啥程序员会觉得写 Zig 效率很高？ 例如 bun 的创始人认为，如果不是 Zig 他不可能在一年内写完那么多代码，也有开源爱好者，选择用 Zig 作为游戏引擎的编程语言，并表示：如果选 Rust 不知道自己得写到啥时候。</p>
+
+<p>下面简单介绍一下 Defer 的用法, 感受一下 Zig 对于内存管理的难易程度</p>
+
+<div class="language-zig highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="n">std</span> <span class="o">=</span> <span class="nb">@import</span><span class="p">(</span><span class="s">"std"</span><span class="p">);</span>
+
+<span class="k">pub</span> <span class="k">fn</span> <span class="n">main</span><span class="p">()</span> <span class="o">!</span><span class="k">void</span> <span class="p">{</span>
+    <span class="c">// 假设我们向操作系统申请了一块内存</span>
+    <span class="k">var</span> <span class="n">gpa</span> <span class="o">=</span> <span class="n">std</span><span class="p">.</span><span class="py">heap</span><span class="p">.</span><span class="nf">GeneralPurposeAllocator</span><span class="p">(</span><span class="o">.</span><span class="p">{}){};</span>
+    <span class="k">const</span> <span class="n">allocator</span> <span class="o">=</span> <span class="n">gpa</span><span class="p">.</span><span class="nf">allocator</span><span class="p">();</span>
+
+    <span class="k">const</span> <span class="n">bytes</span> <span class="o">=</span> <span class="k">try</span> <span class="n">allocator</span><span class="p">.</span><span class="nf">alloc</span><span class="p">(</span><span class="kt">u8</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="c">// 紧跟在申请成功后，声明离开作用域时释放内存</span>
+    <span class="k">defer</span> <span class="n">allocator</span><span class="p">.</span><span class="nf">free</span><span class="p">(</span><span class="n">bytes</span><span class="p">);</span> 
+
+    <span class="c">// 在接下来的代码中，你可以随意处理业务逻辑、提前 return </span>
+    <span class="c">// 或者遇到错误报错。无论如何，bytes 都会被安全地释放。</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">some_condition</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span> <span class="c">// 此时 defer 也会执行！</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>注意 allocator 是会被大量复用的，一般都是在 main 开始的时候初始化一个内存管家，然后传入所有需要使用堆内存的函数.</p>
+
+<p>这很有意思,它不仅能在函数结束的时候自动释放这一块的内存，而且你还能一眼看出来，那些函数有内存需要释放. 但缺点就是你必须手动写, 编译器不会自动加。不过因为在 Zig 里 test 是一等公民，所以如果写了，在运行的时候会检查有没有内存泄漏之类的问题，不必太过担心. 因为相比于 C 这简单太多太多了</p>
+
+<p>除此之外，我一开始觉得 Zig 的语法很奇怪，为什么要在初始化一个对象的时候在属性前加 <code class="language-plaintext highlighter-rouge">.</code> 呢，而且 <code class="language-plaintext highlighter-rouge">.</code> 的频率似乎也挺高的，看起来很别扭</p>
+
+<p>其实在 Zig 中，大括号前面的 <code class="language-plaintext highlighter-rouge">.</code> 代表匿名和省略, 编译器会根据上下文自动推导他的具体类型, 例如：</p>
+
+<div class="language-zig highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// 假设函数定义为：fn register(user: User) void</span>
+<span class="n">register</span><span class="p">(</span><span class="n">User</span><span class="p">{</span> <span class="p">.</span><span class="py">name</span> <span class="o">=</span> <span class="s">"Alice"</span><span class="p">,</span> <span class="p">.</span><span class="py">age</span> <span class="o">=</span> <span class="mi">25</span> <span class="p">});</span>
+</code></pre></div></div>
+
+<div class="language-zig highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// 编译器看一眼 register 的参数定义，就知道里面肯定是 User，因此允许省略</span>
+<span class="n">register</span><span class="p">(</span><span class="o">.</span><span class="p">{</span> <span class="p">.</span><span class="py">name</span> <span class="o">=</span> <span class="s">"Alice"</span><span class="p">,</span> <span class="p">.</span><span class="py">age</span> <span class="o">=</span> <span class="mi">25</span> <span class="p">});</span>
+</code></pre></div></div>
+
+<p>同时这也是为什么在初始化 <code class="language-plaintext highlighter-rouge">GeneralPurposeAllocator(.{})</code> 的时候， 可以直接写成 <code class="language-plaintext highlighter-rouge">.{}</code>。</p>
+
+<p>这样设计还有另一个原因，高级语言中的大括号承载了太多功能，既是对象又是代码块，Zig 为了极致的编译速度，通过点和冒号做出了更明确的分工</p>
+
+<p><code class="language-plaintext highlighter-rouge">name: u32</code> 这是声明 <code class="language-plaintext highlighter-rouge">.name = 25</code> 这是初始化</p>
+
+<p>以及 Zig 的 try 和 catch 不是连在一起的，显得非常简洁.</p>
+
+<p>但是 Zig 的类型推导不会像 Rust 一样繁重，他的宏就是 Zig 代码，LSP运行起来也很轻量。编译速度也很快.</p>
+
+<h3 id="js">JS</h3>
+<p>JS 是一门很特别的语言，他既是解释性语言又是编译型语言</p>
+
+<ul>
+  <li>表面上看源码不需要提前编译成 <code class="language-plaintext highlighter-rouge">.exe</code> 运行时可以直接像 Python 运行一样 一行行读、一行行跑</li>
+  <li>底层来看，他又是编译型语言,现代JS 引擎加入了 JIT(Just-In-Time) 实时编译技术，在代码运行的同时，后台的 Profiler 会盯着热点代码，将重复使用的代码编译成接近 C 效率的机器码</li>
+</ul>
+
+<p>JS 的运行时五花八门, 不仅有浏览器环境，也有无服务器端的 LLRT</p>
+
+<p>现在主流的 JS 引擎是 Google V8、Apple JSC 还有 QuickJS</p>
+
+<h2 id="总结">总结</h2>
+<p>一行行写这些东西还是十分费劲的，但我还是觉得在这个探索过程中我学到了这么多，得写成文字记录下来，因为从这些设计中,我看到了现代程序员在实践过程中经验的总结，会把一些丑陋的语法例如 try catch 变成更简洁，更清晰的设计，会重新思考如何管理变量，什么时候进行内存释放等等，也看到了编程语言不仅仅是在应用场景上划分，也可以在语法设计，编译运行，开发体验中看出很多区别</p>
+
+<p>在 AI 横行时代，有坚持自我的 Zig, 也有更适合 AI 的编程语言(Rust), 这也让我觉得也许世界并没有那么糟糕，还是可以看到有人在修修补补的 :)</p>
+
+
+        </article>
+    </main>
+
+    <!-- 让 highlight.js 自动扫描并高亮你的所有代码块（包含本地的 Zig 语言支持） -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            hljs.highlightAll();
+        });
+    </script>
+</body>
+
+</html>

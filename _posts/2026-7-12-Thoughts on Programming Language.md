@@ -84,7 +84,7 @@ pub fn main() !void {
     const allocator = gpa.allocator();
 
     const bytes = try allocator.alloc(u8, 100);
-    // 💡 重点：紧跟在申请成功后，声明离开作用域时释放内存
+    // 紧跟在申请成功后，声明离开作用域时释放内存
     defer allocator.free(bytes); 
 
     // 在接下来的代码中，你可以随意处理业务逻辑、提前 return 

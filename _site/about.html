@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About forest</title>
+</head>
+<body>
+    <div class="back">返回</div>
+    <div class="about">
+        <h1>关于</h1>
+        <ul>
+            <li>创作起源: 开源、反哺</li>
+            <li>主要内容：可能十分广泛（机器学习、论文解读、工具介绍、观点阐述）</li>
+            <li>作者身份：一个想改变世界的人。如果喜欢我的内容，请持续关注</li>
+            <li>更新频率：随心</li>
+        </ul>
+    </div>
+</body>
+</html>
+
+<style>
+.back {
+    position: fixed;
+    left:25vw;
+    top:5vh;
+    cursor: pointer;
+}
+.about {
+    width: 80vw;
+    margin:auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+ul {
+    font-size: 18px;
+    list-style: none;
+    line-height: 40px;
+}
+</style>
+<script>
+    let back = document.querySelector(".back")
+    back.addEventListener("click", ()=>{
+        console.log("clicked");
+        window.location.assign("index.html");
+    })
+</script>
+
