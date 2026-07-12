@@ -4,12 +4,12 @@ class: post-page
 title: Thoughts on Programming Language
 ---
 
-### 缘由
+## 缘由
 之前就一直对平铺式管理窗口的工作模式很感兴趣，但是始终觉得像 Hyprland, Niri 这一类新时代的 Wayland 桌面环境太重了,有点过于追求视觉审美(没有冒犯的意思, bushi, 任何能达到高效率的工作方式都是极好的！！) 
 
 所以想尝试一些更轻量化的 Wayland 方案，例如 [River](https://codeberg.org/river/river) 一个比较小众的 Wayland Compositor. 0.4.0 版本以前的 River-classic 还是一个桌面环境，但作者认为中间有太多的工作可以拆分成更明确的[模块](https://isaacfreund.com/blog/river-window-management/),所以把 Window Manager, Display Server 和 Compositor 拆开了. 故事从这里开始
 
-### River 与 Andrew
+## River 与 Andrew
 River 就是用[Zig](https://codeberg.org/ziglang) 完成的，这是立志成为 Better C 的一门语言，起初我觉得它和 Rust 无出一二，都是新时代的产物吧。但有一则[新闻](https://ziglang.org/news/migrating-from-github-to-codeberg/)引起了我的注意：Zig 的创始人将原本已经放在 Github 上十年的 git 仓库搬到了 Codeberg ，原因如下：
 
 1. 自从 Github 被微软收购成为 Agent 训练场以后，他的工程文化和技术质量下滑，界面臃肿且缓慢
@@ -39,7 +39,7 @@ River 就是用[Zig](https://codeberg.org/ziglang) 完成的，这是立志成�
 2. Rust 天然适合 AI, 我一直觉得 AI 底层的 Transformer 始终是指一个概率模型，那就是抽奖，都是概率问题而且，但 Rust 的语言特性，包括编译管理方式都非常适合无人参与的 AI loop, AI 写一版本代码，让 Rust 编译器检查，根据详尽的报错信息，就可以修改代码，直到通过编译，并运行，这样做出来的代码，天然的 Bug 就少. 可以看出 Rust 在 prictical 方面是非常优秀的
 
 
-### 编程语言大战
+## 编程语言大战
 
 你知道的，新手嘛，喜欢学点新东西很正常，所以多多少少的，什么C++, js, zig, rust, go, java, python, D都看了看，大二时候的我认为不同编程语言之间的区别可能只是单纯由应用场景划分吧，也许 Python 爬虫这块生态好所以用的多，Java 这块稳定高效，所以后端用的多。
 
@@ -50,12 +50,12 @@ River 就是用[Zig](https://codeberg.org/ziglang) 完成的，这是立志成�
 
 除此之外，GC 其实还是挺好的，不需要程序员像写 C 一样手动管理内存，在什么时候回收都必须写的清清楚楚.
 
-#### Rust
+### Rust
 
 回到 Rust 的内存管理，它没有 GC 因为在 Rust 中有一套所有权体系, 任何一个变量都只能有一个owner, 但可以有多个引用，引用又分为可变引用和不可变引用，不可变引用只能读取值，而可变引用只能有一个，可以修改内容。将变量传入函数 或者 遍历(可迭代对象)一次 会消耗所有权，变量会被回收. 在这套体系下，变量能被安全的读取和修改，但是！！ 也因此，Rust的类型推导非常复杂, LSP 为了解析所有变量的生命周期，需要占用大量内存，我很不喜欢 :( 这让我的 VScode 写 rust 的时候卡卡的，当我用迷你主机打开 [Zed](https://github.com/zed-industries/zed) 的时候会直接卡住，还是 16GB 内存哦
 
 
-#### Zig
+### Zig
 
 新生代语言: Zig 他的定位就是成为更好的 C, 设计理念也很清晰，没有隐式的控制流，没有隐式的内存分配，对应的特点如下：
 
@@ -127,7 +127,7 @@ register(.{ .name = "Alice", .age = 25 });
 但是 Zig 的类型推导不会像 Rust 一样繁重，他的宏就是 Zig 代码，LSP运行起来也很轻量。编译速度也很快.
 
 
-#### JS
+### JS
 JS 是一门很特别的语言，他既是解释性语言又是编译型语言
 
 - 表面上看源码不需要提前编译成 `.exe` 运行时可以直接像 Python 运行一样 一行行读、一行行跑
@@ -138,7 +138,7 @@ JS 的运行时五花八门, 不仅有浏览器环境，也有无服务器端的
 现在主流的 JS 引擎是 Google V8、Apple JSC 还有 QuickJS
 
 
-### 总结
+## 总结
 一行行写这些东西还是十分费劲的，但我还是觉得在这个探索过程中我学到了这么多，得写成文字记录下来，因为从这些设计中,我看到了现代程序员在实践过程中经验的总结，会把一些丑陋的语法例如 try catch 变成更简洁，更清晰的设计，会重新思考如何管理变量，什么时候进行内存释放等等，也看到了编程语言不仅仅是在应用场景上划分，也可以在语法设计，编译运行，开发体验中看出很多区别
 
 
