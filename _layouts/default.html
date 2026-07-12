@@ -22,14 +22,74 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- 引入 highlight.js 的 GitHub 浅色主题样式 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <!-- 引入 highlight.js 核心脚本 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <!-- 额外加载对 Zig 语言的支持 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/zig.min.js"></script>
 
+    <!-- 主题样式表：根据 html 标签上的 data-theme 自动切换 -->
+    <link id="hljs-theme" rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+
+    <!-- 提前执行的脚本，防止刷新时白光闪烁（重要！） -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            // 动态选择代码高亮的主题样式文件
+            const hljsTheme = document.getElementById('hljs-theme');
+            if (hljsTheme) {
+                hljsTheme.href = savedTheme === 'dark'
+                    ? "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+                    : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css";
+            }
+        })();
+    </script>
+
     <style>
+        /* 定义全局颜色变量（默认浅色主题） */
+        :root[data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --title-color: #2b5e77;
+            --border-color: #eeeeee;
+            --blockquote-bg: #f8fbfd;
+            --blockquote-border: #2b5e77;
+            --code-inline-bg: #f1f4f6;
+            --code-inline-text: #e83e8c;
+            --code-block-bg: #f6f8fa;
+            --code-block-border: #d0d7de;
+            --link-color: #3182ce;
+            --link-hover: #2c5282;
+            --link-hover-bg: rgba(49, 130, 206, 0.05);
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --mathjax-color: #000000;
+            --post-title-color: rgb(251, 182, 92);
+            --post-title-hover: rgb(90, 183, 230);
+        }
+
+        /* 定义深色（黑色）主题变量 */
+        :root[data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #dddddd;
+            --title-color: #79b8d7;
+            --border-color: #333333;
+            --blockquote-bg: #222629;
+            --blockquote-border: #4a7d96;
+            --code-inline-bg: #2d3139;
+            --code-inline-text: #ff79c6;
+            --code-block-bg: #0d1117;
+            --code-block-border: #30363d;
+            --link-color: #63b3ed;
+            --link-hover: #90cdf4;
+            --link-hover-bg: rgba(99, 179, 237, 0.1);
+            --nav-bg: rgba(26, 26, 26, 0.95);
+            --mathjax-color: #ffffff;
+            --post-title-color: rgb(230, 150, 60);
+            --post-title-hover: rgb(90, 183, 230);
+        }
+
         * {
             padding: 0;
             margin: 0;
@@ -37,11 +97,12 @@
         }
 
         body {
-            background-color: #fff;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: 'Noto Serif SC', 'Georgia', serif;
             -webkit-font-smoothing: antialiased;
             padding-bottom: 40px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .top {
@@ -56,6 +117,7 @@
         .top>div {
             cursor: pointer;
             font-family: sans-serif;
+            user-select: none;
         }
 
         .content {
@@ -70,18 +132,18 @@
             text-align: center;
             width: 400px;
             margin-bottom: 50px;
-            color: rgb(251, 182, 92);
+            color: var(--post-title-color);
             transition: color 0.6s ease;
             cursor: pointer;
             user-select: none;
         }
 
         .index-page .post:hover {
-            color: rgb(90, 183, 230);
+            color: var(--post-title-hover);
         }
 
         .index-page .post>span {
-            color: black;
+            color: var(--text-color);
             cursor: auto;
         }
 
@@ -100,7 +162,7 @@
 
         .post-page h1 {
             text-align: center;
-            color: #2b5e77;
+            color: var(--title-color);
             font-size: 2.2em;
             margin-bottom: 50px;
             margin-top: 20px;
@@ -109,12 +171,12 @@
         .post-page h2,
         .post-page h3 {
             text-align: left;
-            color: #2b5e77;
+            color: var(--title-color);
             margin: 1.6em 0 0.8em;
         }
 
         .post-page h2 {
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 8px;
         }
 
@@ -125,44 +187,41 @@
             margin-bottom: 1.5em;
         }
 
-        /* 优化列表的缩进和对齐，使其与上方段落左侧完美对齐 */
         .post-page ul,
         .post-page ol {
             padding-left: 24px;
             list-style-position: outside;
         }
 
-        /* 如果列表中有嵌套列表，微调下边距防止间距过大 */
         .post-page li {
             margin-bottom: 0.4em;
         }
 
         .post-page blockquote {
-            border-left: 4px solid #2b5e77;
+            border-left: 4px solid var(--blockquote-border);
             padding: 5px 25px;
-            background: #f8fbfd;
+            background: var(--blockquote-bg);
             font-style: italic;
             margin: 25px 0;
         }
 
-        /* 修复引用块下方空行的问题 */
         .post-page blockquote>*:last-child {
             margin-bottom: 0 !important;
         }
 
         mjx-container {
-            color: #000000;
+            color: var(--mathjax-color) !important;
             font-size: 105% !important;
         }
 
         pre {
-            background: #f6f8fa;
+            background: var(--code-block-bg) !important;
             padding: 15px;
             border-radius: 8px;
             font-size: 15px;
             overflow-x: auto;
             margin: 20px 0;
-            border: 1px solid #d0d7de;
+            border: 1px solid var(--code-block-border);
         }
 
         .post-page mark {
@@ -172,17 +231,15 @@
             margin: 0 2px;
         }
 
-        /* 行内代码样式（比如正文里的 `code`） */
         .post-page code {
-            background-color: #f1f4f6;
-            color: #e83e8c;
+            background-color: var(--code-inline-bg);
+            color: var(--code-inline-text);
             padding: 2px 6px;
             border-radius: 4px;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-size: 0.9em;
         }
 
-        /* 多行代码块样式优化：完全移交给 highlight.js 染色，防止文字变粉色 */
         .post-page pre code {
             background-color: transparent !important;
             padding: 0 !important;
@@ -192,16 +249,16 @@
         }
 
         .post-page a {
-            color: #3182ce;
+            color: var(--link-color);
             text-decoration: none;
             border-bottom: 1px solid rgba(49, 130, 206, 0.2);
             transition: all 0.3s ease;
         }
 
         .post-page a:hover {
-            color: #2c5282;
-            border-bottom: 1px solid #2c5282;
-            background-color: rgba(49, 130, 206, 0.05);
+            color: var(--link-hover);
+            border-bottom: 1px solid var(--link-hover);
+            background-color: var(--link-hover-bg);
         }
 
         @media (max-width: 768px) {
@@ -215,7 +272,7 @@
                 gap: 35px;
                 height: 50px;
                 align-items: center;
-                background-color: rgba(255, 255, 255, 0.95);
+                background-color: var(--nav-bg);
                 backdrop-filter: blur(5px);
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
                 z-index: 1000;
@@ -223,7 +280,7 @@
 
             .top>div {
                 font-size: 16px;
-                color: #333;
+                color: var(--text-color);
             }
 
             .content {
@@ -266,6 +323,8 @@
     <nav class="top">
         <div onclick="window.location.assign('/')">首页</div>
         <div onclick="window.location.assign('/about.html')">关于</div>
+        <!-- 增加了切换主题的按钮 -->
+        <div id="theme-toggle" onclick="toggleTheme()">🌓 切换</div>
     </nav>
 
     <main class="content">
@@ -274,11 +333,31 @@
         </article>
     </main>
 
-    <!-- 让 highlight.js 自动扫描并高亮你的所有代码块（包含本地的 Zig 语言支持） -->
     <script>
+        // 页面加载完毕后运行高亮
         document.addEventListener('DOMContentLoaded', (event) => {
             hljs.highlightAll();
         });
+
+        // 切换主题的核心逻辑
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            // 1. 修改 HTML 标签属性触发 CSS 变量更替
+            document.documentElement.setAttribute('data-theme', newTheme);
+
+            // 2. 存入本地缓存，下次打开自动记住
+            localStorage.setItem('theme', newTheme);
+
+            // 3. 动态切换代码高亮库的浅色/深色主题 CSS 文件
+            const hljsTheme = document.getElementById('hljs-theme');
+            if (hljsTheme) {
+                hljsTheme.href = newTheme === 'dark'
+                    ? "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+                    : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css";
+            }
+        }
     </script>
 </body>
 
